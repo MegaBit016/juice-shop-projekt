@@ -1,0 +1,43 @@
+name: Skan DAT (Z ZAP)
+
+on:
+  push:
+    branches: [skandevsec]
+  pull_request:
+    branches: [skandevsec]
+
+jobs:
+  budowa-obrazu-i-uruchomienie-DAST-oraz-skan:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+        ports:
+          - 3000:3000
+
+    env:
+      DOCKER_HOST: tcp://localhost:2375
+      DOCKER_TLS_CERTDIR: ""
+
+    steps:
+      - name: Sprawdź repozytorium
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Dockera
+        uses: docker/setup-docker@v2
+
+      - name: Budowanie obrazu aplikacji
+        run: docker build -t juice-shop-projekt .
+
+      - name: Uruchomienie aplikacji
+        run: docker run -d -p 3000:3000 --name jsp juice-shop-projekt
+
+      - name: Sleep na 15
+        run: sleep 15
+
+      - name: Skanowanie ZAPEM
+        uses: zaproxy/action-full-scan@v0.10.0
+        with:
+          target: 'http://localhost:3000'
