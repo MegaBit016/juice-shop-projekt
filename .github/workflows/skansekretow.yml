@@ -1,0 +1,19 @@
+name: Skan Sekretow 
+
+on:
+  push:
+    branches: [skandevsec]
+  pull_request:
+    branches: [skandevsec]
+
+
+jobs:
+  gitleaks-skan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Sprawdź repozytorium
+        uses: actions/checkout@v3
+        
+      - name: Skanowanie sekretow (GitLeaks)
+        uses: gitleaks/gitleaks-action@v2.3.4
