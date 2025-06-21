@@ -1,0 +1,25 @@
+name: SCA Scan (npm audit)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [skandevsec]
+
+jobs:
+  skan-sca:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sprawdź repozytorium
+        uses: actions/checkout@v4.2.2
+
+      - name: Implementacja Node.js
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: 22
+
+      - name: Instalacja npm
+        run: npm install
+
+      - name: Użycie npm audit do skanu SCA
+        run: npm audit --audit-level=high
