@@ -7,23 +7,12 @@ on:
     branches: [master]
 
 jobs:
-  build-and-test:
+  zbuduj-obraz-dockera:
     runs-on: ubuntu-latest
 
     steps:
       - name: Sprawdź repozytorium
-        uses: actions/checkout@v2
-
-      - name: Implementcja node'a
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-
-      - name: Instalacja NPM
-        run: npm install
-
-      - name: Przeprowadzanie testów
-        run: npm test
+        uses: actions/checkout@v4.2.2
 
       - name: Budowanie obrazu aplikacji w dockerze
         run: docker build -t juice-shop-projekt .
