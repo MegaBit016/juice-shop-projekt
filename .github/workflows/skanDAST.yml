@@ -12,16 +12,20 @@ jobs:
 
     container:
       image: docker:24.0.5-dind
-      options: --privileged 
+      options: --privileged
 
     env:
       DOCKER_HOST: tcp://localhost:2375
       DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Instalacja Dockera w kontenerze
+      - name: Uruchomienie Dockera w tle
         run: |
-          apk add --no-cache docker-cli
+          dockerd-entrypoint.sh &  # <- to start Docker Daemon
+          sleep 10
+
+      - name: Instalacja klienta docker-cli
+        run: apk add --no-cache docker-cli
 
       - name: Sprawdź repozytorium
         uses: actions/checkout@v4.2.2
@@ -32,10 +36,10 @@ jobs:
       - name: Uruchomienie aplikacji
         run: docker run -d -p 3000:3000 --name jsp juice-shop-projekt
 
-      - name: Sleep na 15
+      - name: Czekanie na start aplikacji
         run: sleep 15
 
-      - name: Skanowanie ZAPEM
+      - name: Skan ZAP
         uses: zaproxy/action-full-scan@v0.10.0
         with:
           target: 'http://localhost:3000'
