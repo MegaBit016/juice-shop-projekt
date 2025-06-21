@@ -25,9 +25,6 @@ jobs:
       - name: Sprawdź repozytorium
         uses: actions/checkout@v4.2.2
 
-      - name: Setup Dockera
-        uses: docker/setup-docker@v2
-
       - name: Budowanie obrazu aplikacji
         run: docker build -t juice-shop-projekt .
 
