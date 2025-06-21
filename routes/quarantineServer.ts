@@ -7,14 +7,16 @@ import path from 'node:path'
 import { type Request, type Response, type NextFunction } from 'express'
 
 export function serveQuarantineFiles () {
-  return ({ params, query }: Request, res: Response, next: NextFunction) => {
+  return ({ params }: Request, res: Response, next: NextFunction) => {
     const file = params.file
+    const baseDir = path.resolve('ftp/quarantine/')
+    const targetPath = path.resolve(baseDir, file)
 
-    if (!file.includes('/')) {
-      res.sendFile(path.resolve('ftp/quarantine/', file))
+    if (targetPath.startsWith(baseDir)) {
+      res.sendFile(targetPath)
     } else {
       res.status(403)
-      next(new Error('File names cannot contain forward slashes!'))
+      next(new Error('Invalid file path!'))
     }
   }
 }
