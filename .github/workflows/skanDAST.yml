@@ -1,4 +1,4 @@
-name: Skan DAT (Z ZAP)
+name: DAST Scan z ZAP
 
 on:
   push:
@@ -7,28 +7,32 @@ on:
     branches: [skandevsec]
 
 jobs:
-  budowa-i-skan:
+  dast-zap-scan:
     runs-on: ubuntu-latest
 
-    container:
-      image: docker:24.0.5-dind
-      options: --privileged
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+        ports:
+          - 3000:3000
 
     env:
-      DOCKER_HOST: tcp://localhost:2375
       DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Uruchomienie Dockera w tle
-        run: |
-          dockerd-entrypoint.sh &  # <- to start Docker Daemon
-          sleep 10
-
-      - name: Instalacja klienta docker-cli
-        run: apk add --no-cache docker-cli
-
       - name: Sprawdź repozytorium
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
+
+      - name: Zainstaluj Docker CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Zainicjalizuj Dockera
+        run: |
+          sudo dockerd &
+          sleep 10
 
       - name: Budowanie obrazu aplikacji
         run: docker build -t juice-shop-projekt .
