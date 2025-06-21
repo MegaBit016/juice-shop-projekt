@@ -7,21 +7,22 @@ on:
     branches: [skandevsec]
 
 jobs:
-  budowa-obrazu-i-uruchomienie-DAST-oraz-skan:
+  budowa-i-skan:
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-        ports:
-          - 3000:3000
+    container:
+      image: docker:24.0.5-dind
+      options: --privileged 
 
     env:
       DOCKER_HOST: tcp://localhost:2375
       DOCKER_TLS_CERTDIR: ""
 
     steps:
+      - name: Instalacja Dockera w kontenerze
+        run: |
+          apk add --no-cache docker-cli
+
       - name: Sprawdź repozytorium
         uses: actions/checkout@v4.2.2
 
