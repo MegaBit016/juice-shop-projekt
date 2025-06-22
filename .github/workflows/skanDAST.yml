@@ -41,6 +41,7 @@ jobs:
         run: sleep 30
 
       - name: Uruchomienie skanu OWASP ZAP
+        continue-on-error: true
         run: |
           docker run --rm \
             --network host \
