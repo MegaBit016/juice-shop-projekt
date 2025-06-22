@@ -36,9 +36,6 @@ jobs:
 
       - name: Utworzenie katalogu na raport 
         run: mkdir -p raporty
-
-      - name: Pokaż zawartość katalogu raporty przed skanem
-        run: ls -la raporty
       
       - name: Uruchomienie skanu OWASP ZAP
         continue-on-error: true
@@ -52,9 +49,3 @@ jobs:
         with:
           name: raport-zap
           path: raporty/raport.html
-
-      - name: Szukaj pliku raport.html w całym systemie
-        run: find / -name raport.html 2>/dev/null
-
-      - name: Pokaż zawartość katalogu raporty przed skanem
-        run: ls -la raporty
