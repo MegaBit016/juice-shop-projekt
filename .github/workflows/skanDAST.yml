@@ -7,7 +7,7 @@ on:
     branches: [skandevsec]
 
 jobs:
-  dast-zap-scan:
+  skan-dast-zap:
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -25,19 +25,19 @@ jobs:
           dockerd-entrypoint.sh &
           sleep 10
 
-      - name: Sprawdź repozytorium
-        uses: actions/checkout@v4
+      - name: Sprawdzenie repozytorium
+        uses: actions/checkout@v4.2.2
 
-      - name: Utwórz sieć dockera
+      - name: Tworzenie sieci dokerowej
         run: docker network create zapnet
 
-      - name: Buduj obraz aplikacji
+      - name: Budowa obrazu apki
         run: docker build -t juice-shop-projekt .
 
-      - name: Uruchom aplikację w kontenerze
+      - name: Uruchomienie juice-shopa w kontenerze
         run: docker run -d --network zapnet --name juice-shop -p 3000:3000 juice-shop-projekt
 
-      - name: Sleep - czekaj aż aplikacja wystartuje
+      - name: Sleep na 15
         run: sleep 15
 
       - name: Uruchom skan OWASP ZAP
@@ -45,10 +45,4 @@ jobs:
           docker run --rm --network zapnet \
             -v $(pwd):/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-full-scan.py -t http://juice-shop:3000 -r report.html
-
-      - name: Zapisz raport jako artefakt
-        uses: actions/upload-artifact@v4
-        with:
-          name: raport-zap
-          path: report.html
+            zap-full-scan.py -t http://juice-shop:3000
