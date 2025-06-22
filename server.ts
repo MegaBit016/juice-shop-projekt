@@ -147,6 +147,14 @@ app.use(helmet.contentSecurityPolicy({
   }
 }));
 
+app.use((req, res, next) => {
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), camera=(), microphone=()'
+  );
+  next();
+});
+
 const server = new http.Server(app)
 
 // errorhandler requires us from overwriting a string property on it's module which is a big no-no with esmodules :/
