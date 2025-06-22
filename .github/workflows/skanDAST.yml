@@ -23,6 +23,9 @@ jobs:
           dockerd-entrypoint.sh &
           sleep 10
 
+      - name: Checkout repozytorium
+        uses: actions/checkout@v4.2.2
+
       - name: Zbuduj obraz dockera
         run: docker build -t juice-shop-projekt .
 
