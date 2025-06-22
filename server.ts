@@ -211,17 +211,6 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.use(helmet.frameguard())
   app.use(helmet.xssFilter()); // = no protection from persisted XSS via RESTful API
   app.disable('x-powered-by')
-  app.use(
-    helmet.permissionsPolicy({
-      policies: {
-        payment: ['self'],
-        fullscreen: ['self'],
-        geolocation: [],
-        microphone: [],
-        camera: []
-      }
-    })
-  );
 
   /* Hiring header */
   app.use((req: Request, res: Response, next: NextFunction) => {
