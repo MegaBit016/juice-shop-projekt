@@ -127,6 +127,20 @@ import { ensureFileIsPassed, handleZipFileUpload, checkUploadSize, checkFileType
 
 const app = express()
 
+app.use(helmet.contentSecurityPolicy({
+  useDefaults: true,
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+    styleSrc: ["'self'", "https://fonts.googleapis.com"],
+    fontSrc: ["'self'", "https://fonts.gstatic.com"],
+    imgSrc: ["'self'", "data:"],
+    connectSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    upgradeInsecureRequests: []
+  }
+}));
+
 const server = new http.Server(app)
 
 // errorhandler requires us from overwriting a string property on it's module which is a big no-no with esmodules :/
