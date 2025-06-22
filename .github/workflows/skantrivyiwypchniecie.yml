@@ -5,7 +5,7 @@ on:
     branches: [skandevsec]
 
 jobs:
-  build-scan-push:
+  budowa-skan-i-wypchniecie:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: juice-shop-projekt:latest
-          format: table
+          format: json
           exit-code: 0
           ignore-unfixed: true
           severity: HIGH,CRITICAL
