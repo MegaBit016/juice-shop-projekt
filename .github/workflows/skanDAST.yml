@@ -14,9 +14,8 @@ jobs:
         DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Instalacja Docker CLI oraz curl
-        run: |
-          apk add --no-cache docker-cli curl
+      - name: Instalacja Docker CLI
+        run: apk add --no-cache docker-cli
 
       - name: Uruchomienie Docker daemon
         run: |
@@ -30,17 +29,15 @@ jobs:
         run: docker build -t juice-shop-projekt .
 
       - name: Uruchomienie kontenera juice-shop-projekt
-        run: |
-          docker run -d --network host --name juice-shop -p 3000:3000 juice-shop-projekt
+        run: docker run -d --network host --name juice-shop -p 3000:3000 juice-shop-projekt
 
       - name: Sleep na 30
         run: sleep 30
-
       - name: Uruchomienie skanu OWASP ZAP
-        run: |
-          docker run --user 0 --network host -v $PWD:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r raport.html
+        continue-on-error: true
+        run: docker run --user 0 --network host -v $PWD:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://localhost:3000 -r raport.html
 
-      - name: Zapisz raport jako artefakt
+      - name: Zapisanie raportu jako artefakt
         uses: actions/upload-artifact@v4
         with:
           name: raport-zap
