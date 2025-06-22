@@ -1,0 +1,35 @@
+name: Skan trivy i Push do GHCR
+
+on:
+  push:
+    branches: [skandevsec]
+
+jobs:
+  build-scan-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sprawdzenie kodu
+        uses: actions/checkout@v4.2.2
+
+      - name: Budowa obrazu dockera
+        run: docker build -t juice-shop-projekt:latest .
+
+      - name: Skan obrazu z wykorzystaniem Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: juice-shop-projekt:latest
+          format: table
+          exit-code: 0
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+          output: trivy-report.txt
+
+      - name: Pokazanie raportu
+        run: cat trivy-report.txt
+
+      - name: Zapisanie raportu jako artefakt
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt
