@@ -134,7 +134,7 @@ app.use(helmet.contentSecurityPolicy({
     scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],
     styleSrc: ["'self'", "https://fonts.googleapis.com"],
     fontSrc: ["'self'", "https://fonts.gstatic.com"],
-    imgSrc: ["'self'", "data:"],
+    imgSrc: ["'self'", "data"],
     connectSrc: ["'self'"],
     objectSrc: ["'none'"],
     frameSrc: ["'none'"],
