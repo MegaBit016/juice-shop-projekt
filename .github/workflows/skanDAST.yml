@@ -42,7 +42,4 @@ jobs:
 
       - name: Uruchom skan OWASP ZAP
         run: |
-          docker run --rm --network zapnet \
-            -v $(pwd):/zap/wrk \
-            ghcr.io/zaproxy/zaproxy:stable \
-            zap-full-scan.py -t http://juice-shop:3000
+          docker run --rm --network zapnet ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://juice-shop:3000 -m 5
