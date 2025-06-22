@@ -3,11 +3,9 @@ name: Skan DAST (ZAP)
 on:
   push:
     branches: [skandevsec]
-  pull_request:
-    branches: [skandevsec]
 
 jobs:
-  dast-scan:
+  dast-zap:
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -16,29 +14,32 @@ jobs:
         DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Instaluj Docker CLI i curl
-        run: apk add --no-cache docker-cli curl
-
-      - name: Uruchom Docker Daemon
+      - name: Instalacja Docker CLI, curl i docker-compose
         run: |
-          dockerd-entrypoint.sh &  # uruchom demona
+          apk add --no-cache docker-cli docker-compose curl
+
+      - name: Uruchom Docker daemon
+        run: |
+          dockerd-entrypoint.sh &
           sleep 10
 
-      - name: Checkout kod
-        uses: actions/checkout@v4
-
-      - name: Uruchom aplikację w tle (na porcie 3000)
+      - name: Uruchom oficjalny obraz Juice Shop
         run: |
-          run: docker compose up -d
+          docker run -d \
+            --network host \
+            --name juice-shop \
+            -p 3000:3000 \
+            bkimminich/juice-shop
 
-      - name: Poczekaj na uruchomienie aplikacji
-        run: sleep 15
-
-      - name: Testuj aplikację curl-em
+      - name: Poczekaj na aplikację
         run: |
-          curl -I http://localhost:3000 || (echo "Aplikacja nie działa!" && exit 1)
+          for i in {1..10}; do
+            curl -I http://localhost:3000 && break
+            echo "Czekam na aplikację..."
+            sleep 5
+          done
 
-      - name: Uruchom ZAP Baseline Scan
+      - name: Uruchom skan OWASP ZAP
         run: |
           docker run --rm \
             --network host \
