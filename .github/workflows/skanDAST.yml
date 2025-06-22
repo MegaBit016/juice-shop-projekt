@@ -42,7 +42,7 @@ jobs:
       
       - name: Uruchomienie skanu OWASP ZAP
         continue-on-error: true
-        run: docker run --user 0 --network host -v $PWD/raporty:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r raport.html
+        run: docker run --user 0 --name zap-scan --network host -v $PWD/raporty:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r raport.html
 
       - name: Skopiuj raport z kontenera
         run: docker cp zap-scan:/zap/wrk/raport.html raporty/raport.html
