@@ -36,7 +36,7 @@ jobs:
         run: docker run -d --network host --name juice-shop juice-shop-projekt
 
       - name: Poczekaj aż aplikacja się uruchomi
-        run: sleep 15
+        run: sleep 60
 
       - name: Uruchomienie skanowania ZAP
         run: |
