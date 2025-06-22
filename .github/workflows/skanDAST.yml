@@ -5,7 +5,7 @@ on:
     branches: [skandevsec]
 
 jobs:
-  dast-zap:
+  skanowanie-dast-zap:
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -14,22 +14,22 @@ jobs:
         DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Instalacja Docker CLI, curl i docker-compose
+      - name: Instalacja Docker CLI
         run: |
-          apk add --no-cache docker-cli docker-compose curl
+          apk add --no-cache docker-cli
 
-      - name: Uruchom Docker daemon
+      - name: Uruchomienie Docker daemon
         run: |
           dockerd-entrypoint.sh &
           sleep 10
 
-      - name: Checkout repozytorium
+      - name: Sprawdzenie repozytorium
         uses: actions/checkout@v4.2.2
 
-      - name: Zbuduj obraz dockera
+      - name: Budowa obrazu aplikacji
         run: docker build -t juice-shop-projekt .
 
-      - name: Uruchom oficjalny obraz Juice Shop
+      - name: Uruchomienie kontenera juice-shop-projekt
         run: |
           docker run -d \
             --network host \
@@ -37,10 +37,10 @@ jobs:
             -p 3000:3000 \
             juice-shop-projekt
 
-      - name: Poczekaj na aplikację
+      - name: Sleep na 30
         run: sleep 30
 
-      - name: Uruchom skan OWASP ZAP
+      - name: Uruchomienie skanu OWASP ZAP
         run: |
           docker run --rm \
             --network host \
