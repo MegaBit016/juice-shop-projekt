@@ -178,8 +178,13 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.use(compression())
 
   /* Bludgeon solution for possible CORS problems: Allow everything! */
-  app.options('*', cors())
-  app.use(cors())
+  const corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200
+  };
+  
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
 
   /* Security middleware */
   app.use(helmet.noSniff())
