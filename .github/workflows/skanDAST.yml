@@ -1,4 +1,4 @@
-name: DAST Scan (DinD)
+name: Skan DAST (ZAP)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [skandevsec]
 
 jobs:
-  dast-zap-scan:
+  budowa-obrazu-i-skan-dast:
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -16,27 +16,27 @@ jobs:
         DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Zainstaluj Docker CLI i podstawowe narzędzia
+      - name: Instalacja Dockera CLI
         run: |
           apk add --no-cache docker-cli curl
 
-      - name: Uruchom Docker Daemon w tle
+      - name: Uruchomienie Dockera Daemona w tle
         run: |
           dockerd-entrypoint.sh &
           sleep 10
 
-      - name: Checkout repozytorium
-        uses: actions/checkout@v4
+      - name: Sprawdzenie repozytorium
+        uses: actions/checkout@v4.2.2
 
-      - name: Zbuduj obraz aplikacji
+      - name: Budowa obrazu aplikacji
         run: docker build -t juice-shop-projekt .
 
-      - name: Uruchom aplikację
-        run: docker run -d -p 3000:3000 --name juice-shop-projekt juice-shop-projekt
+      - name: Uruchomienie aplikacji ze zbudowanego obrazu
+        run: docker run -d -p 3000:3000 --name jsp juice-shop-projekt
 
-      - name: Poczekaj aż aplikacja się uruchomi
+      - name: Sleep na 15
         run: sleep 15
 
-      - name: Uruchom OWASP ZAP
+      - name: Uruchomienie skanu DAST ZAP
         run: |
-          docker run --network host ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://localhost:3000 -r report.html
+          docker run --network host ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://localhost:3000
