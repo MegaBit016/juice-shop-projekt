@@ -1,4 +1,4 @@
-name: DAST Scan (ZAP DinD)
+name: Skan DAST (ZAP)
 
 on:
   push:
@@ -7,9 +7,8 @@ on:
     branches: [skandevsec]
 
 jobs:
-  dast-zap-scan:
+  zap-dast-scan:
     runs-on: ubuntu-latest
-
     container:
       image: docker:24.0.5-dind
       options: --privileged
@@ -18,10 +17,9 @@ jobs:
 
     steps:
       - name: Instalacja Docker CLI i curl
-        run: |
-          apk add --no-cache docker-cli curl
+        run: apk add --no-cache docker-cli curl
 
-      - name: Uruchomienie Dockera Daemona w tle
+      - name: Uruchom Docker Daemon
         run: |
           dockerd-entrypoint.sh &
           sleep 10
@@ -29,26 +27,29 @@ jobs:
       - name: Checkout repozytorium
         uses: actions/checkout@v4
 
-      - name: Budowa obrazu aplikacji
+      - name: Buduj obraz aplikacji Juice Shop
         run: docker build -t juice-shop-projekt .
 
-      - name: Uruchomienie aplikacji
-        run: docker run -d --network host --name juice-shop juice-shop-projekt
+      - name: Uruchom aplikację w tle (z siecią host)
+        run: docker run -d --network host --name juice-shop -p 3000:3000 juice-shop-projekt
 
-      - name: Poczekaj aż aplikacja się uruchomi
-        run: sleep 60
+      - name: Poczekaj na uruchomienie aplikacji
+        run: sleep 15
 
-      - name: Uruchomienie skanowania ZAP
+      - name: Testuj aplikację curl-em
         run: |
-          docker run --rm --network host -v $(pwd):/zap/wrk \
+          curl -I http://localhost:3000 || (echo "Aplikacja nie działa!" && exit 1)
+
+      - name: Uruchom OWASP ZAP DAST Scan i zapisz raport
+        run: |
+          docker run --rm \
+            --network host \
+            -v $PWD:/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-full-scan.py \
-              -t http://localhost:3000 \
-              -m 10 -j -d \
-              -r report.html
+            zap-baseline.py -t http://localhost:3000 -r report.html
 
       - name: Zapisz raport jako artefakt
         uses: actions/upload-artifact@v4
         with:
-          name: zap-raport
+          name: raport-zap
           path: report.html
