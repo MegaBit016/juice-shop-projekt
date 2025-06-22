@@ -128,7 +128,7 @@ import { ensureFileIsPassed, handleZipFileUpload, checkUploadSize, checkFileType
 const app = express()
 
 app.use(helmet.contentSecurityPolicy({
-  useDefaults: true,
+  useDefaults: false,
   directives: {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],
@@ -137,6 +137,12 @@ app.use(helmet.contentSecurityPolicy({
     imgSrc: ["'self'", "data:"],
     connectSrc: ["'self'"],
     objectSrc: ["'none'"],
+    frameSrc: ["'none'"],
+    mediaSrc: ["'none'"],
+    workerSrc: ["'none'"],
+    manifestSrc: ["'none'"],
+    formAction: ["'self'"],
+    baseUri: ["'self'"],
     upgradeInsecureRequests: []
   }
 }));
