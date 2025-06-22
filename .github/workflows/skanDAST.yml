@@ -1,4 +1,4 @@
-name: DAST z ZAP (Docker-in-Docker)
+name: DAST Scan (DinD)
 
 on:
   push:
@@ -7,40 +7,36 @@ on:
     branches: [skandevsec]
 
 jobs:
-  dast:
+  dast-zap-scan:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-        ports:
-          - 2375:2375
-          - 3000:3000  # Twoja aplikacja
-
-    env:
-      DOCKER_HOST: tcp://localhost:2375
-      DOCKER_TLS_CERTDIR: ""
+    container:
+      image: docker:24.0.5-dind
+      options: --privileged
+      env:
+        DOCKER_TLS_CERTDIR: ""
 
     steps:
+      - name: Zainstaluj Docker CLI i podstawowe narzędzia
+        run: |
+          apk add --no-cache docker-cli curl
+
+      - name: Uruchom Docker Daemon w tle
+        run: |
+          dockerd-entrypoint.sh &
+          sleep 10
+
       - name: Checkout repozytorium
         uses: actions/checkout@v4
-
-      - name: Zainstaluj Docker CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
 
       - name: Zbuduj obraz aplikacji
         run: docker build -t juice-shop-projekt .
 
       - name: Uruchom aplikację
-        run: docker run -d -p 3000:3000 --name jsp juice-shop-projekt
+        run: docker run -d -p 3000:3000 --name juice-shop-projekt juice-shop-projekt
 
-      - name: Poczekaj na start aplikacji
+      - name: Poczekaj aż aplikacja się uruchomi
         run: sleep 15
 
-      - name: Skanowanie OWASP ZAP
-        uses: zaproxy/action-full-scan@v0.10.0
-        with:
-          target: 'http://localhost:3000'
+      - name: Uruchom OWASP ZAP
+        run: |
+          docker run --network host ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://localhost:3000 -r report.html
