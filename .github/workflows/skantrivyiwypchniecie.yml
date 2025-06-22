@@ -39,10 +39,10 @@ jobs:
         with:
           registry: ghcr.io
           username: MegaBit016
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Tagowanie i push do GHCR
         run: |
-          IMAGE=ghcr.io/MegaBit016/juice-shop-projekt:latest
+          IMAGE=ghcr.io/megabit016/juice-shop-projekt:latest
           docker tag juice-shop-projekt:latest $IMAGE
           docker push $IMAGE
