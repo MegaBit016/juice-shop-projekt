@@ -7,7 +7,7 @@ on:
     branches: [skandevsec]
 
 jobs:
-  budowa-obrazu-i-skan-dast:
+  dast-zap-scan:
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -16,7 +16,7 @@ jobs:
         DOCKER_TLS_CERTDIR: ""
 
     steps:
-      - name: Instalacja Dockera CLI
+      - name: Instalacja Docker CLI i curl
         run: |
           apk add --no-cache docker-cli curl
 
@@ -25,18 +25,30 @@ jobs:
           dockerd-entrypoint.sh &
           sleep 10
 
-      - name: Sprawdzenie repozytorium
-        uses: actions/checkout@v4.2.2
+      - name: Sprawdź repozytorium
+        uses: actions/checkout@v4
 
-      - name: Budowa obrazu aplikacji
+      - name: Utwórz sieć dockera
+        run: docker network create zapnet
+
+      - name: Buduj obraz aplikacji
         run: docker build -t juice-shop-projekt .
 
-      - name: Uruchomienie aplikacji ze zbudowanego obrazu
-        run: docker run -d -p 3000:3000 --name jsp juice-shop-projekt
+      - name: Uruchom aplikację w kontenerze
+        run: docker run -d --network zapnet --name juice-shop -p 3000:3000 juice-shop-projekt
 
-      - name: Sleep na 15
+      - name: Sleep - czekaj aż aplikacja wystartuje
         run: sleep 15
 
-      - name: Uruchomienie skanu DAST ZAP
+      - name: Uruchom skan OWASP ZAP
         run: |
-          docker run --network host ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://localhost:3000
+          docker run --rm --network zapnet \
+            -v $(pwd):/zap/wrk \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-full-scan.py -t http://juice-shop:3000 -r report.html
+
+      - name: Zapisz raport jako artefakt
+        uses: actions/upload-artifact@v4
+        with:
+          name: raport-zap
+          path: report.html
