@@ -207,7 +207,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   /* Bludgeon solution for possible CORS problems: Allow everything! */
   const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: '*',
     optionsSuccessStatus: 200
   };
   
