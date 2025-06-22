@@ -46,4 +46,4 @@ jobs:
             --network host \
             -v $PWD:/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:3000 || true
+            zap-baseline.py -t http://localhost:3000
