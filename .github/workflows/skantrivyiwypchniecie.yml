@@ -31,5 +31,18 @@ jobs:
       - name: Zapisanie raportu jako artefakt
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-report
+          name: trivy-report-prior-release
           path: trivy-report.txt
+
+      - name: Logowanie do GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: MegaBit016
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tagowanie i push do GHCR
+        run: |
+          IMAGE=ghcr.io/MegaBit016/juice-shop-projekt:latest
+          docker tag juice-shop-projekt:latest $IMAGE
+          docker push $IMAGE
