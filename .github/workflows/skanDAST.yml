@@ -23,21 +23,19 @@ jobs:
           dockerd-entrypoint.sh &
           sleep 10
 
+      - name: Zbuduj obraz dockera
+        run: docker build -t juice-shop-projekt .
+
       - name: Uruchom oficjalny obraz Juice Shop
         run: |
           docker run -d \
             --network host \
             --name juice-shop \
             -p 3000:3000 \
-            bkimminich/juice-shop
+            juice-shop-projekt
 
       - name: Poczekaj na aplikację
-        run: |
-          for i in {1..10}; do
-            curl -I http://localhost:3000 && break
-            echo "Czekam na aplikację..."
-            sleep 5
-          done
+        run: sleep 30
 
       - name: Uruchom skan OWASP ZAP
         run: |
@@ -45,10 +43,4 @@ jobs:
             --network host \
             -v $PWD:/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:3000 -r report.html
-
-      - name: Zapisz raport jako artefakt
-        uses: actions/upload-artifact@v4
-        with:
-          name: raport-zap
-          path: report.html
+            zap-baseline.py -t http://localhost:3000
