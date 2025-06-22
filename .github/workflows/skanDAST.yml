@@ -43,3 +43,5 @@ jobs:
           name: raport-zap
           path: raport.html
 
+      - name: Szukaj pliku raport.html w całym systemie
+        run: find / -name raport.html 2>/dev/null
